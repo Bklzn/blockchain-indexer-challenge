@@ -3,7 +3,8 @@ import { Pool } from "pg";
 import { randomUUID } from "crypto";
 import blocksRoutes from "./blocks";
 
-export const fastify = Fastify({ logger: true });
+const fastify = Fastify({ logger: true });
+export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 fastify.get("/", async (request, reply) => {
   return { hello: "world" };

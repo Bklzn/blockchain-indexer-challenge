@@ -4,7 +4,6 @@ import { randomUUID } from "crypto";
 import blocksRoutes from "./blocks";
 
 const fastify = Fastify({ logger: true });
-export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 fastify.get("/", async (request, reply) => {
   return { hello: "world" };
@@ -33,7 +32,7 @@ async function testPostgres(pool: Pool) {
   console.log("USERS", rows);
 }
 
-async function createTables(pool: Pool) {
+export async function createTables(pool: Pool) {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS users (
       id TEXT PRIMARY KEY,
@@ -80,13 +79,13 @@ async function createTables(pool: Pool) {
 
 async function bootstrap() {
   console.log("Bootstrapping...");
-  const databaseUrl = process.env.DATABASE_URL;
-  if (!databaseUrl) {
-    throw new Error("DATABASE_URL is required");
+  const { DB_USER, DB_PASSWD, DB_NAME, DB_HOST } = process.env;
+  if (!DB_USER || !DB_PASSWD || !DB_NAME || !DB_HOST) {
+    throw new Error(".env is uncompleted");
   }
 
   const pool = new Pool({
-    connectionString: databaseUrl,
+    connectionString: `postgres://${DB_USER}:${DB_PASSWD}@${DB_HOST}/${DB_NAME}`,
   });
 
   await createTables(pool);

@@ -1,8 +1,8 @@
 import type { Block, Input, Output, Transaction } from "./schema";
 import { createHash } from "crypto";
-import { pool } from "./index";
+import type { Pool } from "pg";
 
-export const isHeightValid = async (newHeight: number) => {
+export const isHeightValid = async (newHeight: number, pool: Pool) => {
   let height = 0;
   await pool
     .query<Block>(`SELECT height FROM blocks ORDER BY height DESC LIMIT 1;`)
@@ -15,7 +15,7 @@ export const isHeightValid = async (newHeight: number) => {
   return newHeight === height + 1;
 };
 
-export const isValuesSumEqual = async (tx: Transaction[]) => {
+export const isValuesSumEqual = async (tx: Transaction[], pool: Pool) => {
   for (const t of tx) {
     const outputs: Output[] = t.outputs;
     const inputs: Input[] = t.inputs;

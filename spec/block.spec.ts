@@ -5,15 +5,9 @@ import { isBlockIdValid, isValuesSumEqual, isHeightValid } from "../src/utils";
 import { testPool } from "./setup";
 
 test("test isHeightValid()", async () => {
-  let height = 1;
-  const validHeight = await isHeightValid(height, testPool);
+  const validHeight = await isHeightValid(3, testPool);
   expect(validHeight).toBe(true);
-  await testPool
-    .query(`INSERT INTO blocks (id,height) VALUES ('block1',1);`)
-    .catch((err) => {
-      throw new Error(err);
-    });
-  const invalidHeight = await isHeightValid(height, testPool);
+  const invalidHeight = await isHeightValid(2, testPool);
   expect(invalidHeight).toBe(false);
 });
 
@@ -33,17 +27,6 @@ test("test isValuesSumEqual()", async () => {
     inputs: [{ txId: "tx1", index: 0 }],
     outputs: [],
   });
-  await testPool
-    .query(
-      `
-    INSERT INTO blocks (id,height) VALUES ('block2',2);
-    INSERT INTO transactions (id, blockid) VALUES ('tx1', 'block2');
-    INSERT INTO outputs (txid,index,address,value) VALUES ('tx1',0,'addr1',100);
-    `
-    )
-    .catch((err) => {
-      throw new Error(err);
-    });
   const invalidSums = await isValuesSumEqual(block.transactions, testPool);
   expect(invalidSums).toBe(false);
 });

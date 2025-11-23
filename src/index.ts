@@ -2,13 +2,12 @@ import Fastify from "fastify";
 import { Pool } from "pg";
 import { randomUUID } from "crypto";
 import blocksRoutes from "./blocks";
-
+import balanceRoutes from "./balance";
 const fastify = Fastify({ logger: true });
 
 fastify.get("/", async (request, reply) => {
   return { hello: "world" };
 });
-fastify.register(blocksRoutes);
 
 async function testPostgres(pool: Pool) {
   const id = randomUUID();
@@ -90,6 +89,9 @@ async function bootstrap() {
 
   await createTables(pool);
   await testPostgres(pool);
+
+  fastify.register(blocksRoutes, { pool });
+  fastify.register(balanceRoutes, { pool });
 }
 
 try {

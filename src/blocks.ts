@@ -3,11 +3,11 @@ import type { Block } from "./schema";
 import { isBlockIdValid, isHeightValid, isValuesSumEqual } from "./utils";
 import { Pool } from "pg";
 
-export default async function blocksRoutes(fastify: FastifyInstance) {
-  const { DB_USER, DB_PASSWD, DB_NAME, DB_HOST } = process.env;
-  const pool = new Pool({
-    connectionString: `postgres://${DB_USER}:${DB_PASSWD}@${DB_HOST}/${DB_NAME}`,
-  });
+export default async function blocksRoutes(
+  fastify: FastifyInstance,
+  opts: { pool: Pool }
+) {
+  const pool = opts.pool;
   const saveBlock = async (block: Block, errCallback: (err: any) => void) => {
     await pool.query("BEGIN");
     await pool

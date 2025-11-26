@@ -3,6 +3,7 @@ import { Pool } from "pg";
 import { randomUUID } from "crypto";
 import blocksRoutes from "./blocks";
 import balanceRoutes from "./balance";
+import { rollbackRoute } from "./rollback";
 const fastify = Fastify({ logger: true });
 
 fastify.get("/", async (request, reply) => {
@@ -92,6 +93,7 @@ async function bootstrap() {
 
   fastify.register(blocksRoutes, { pool });
   fastify.register(balanceRoutes, { pool });
+  fastify.register(rollbackRoute, { pool });
 }
 
 try {

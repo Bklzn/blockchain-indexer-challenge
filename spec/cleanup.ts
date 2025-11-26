@@ -1,6 +1,16 @@
 import { Pool } from "pg";
 import { TEST_DB_NAME, testPool } from "./setup";
 
+export async function cleanupData(testName: string) {
+  if (testPool) {
+    await testPool.query(`DELETE FROM blocks;`);
+    await testPool.query(`DELETE FROM transactions;`);
+    await testPool.query(`DELETE FROM outputs;`);
+    await testPool.query(`DELETE FROM inputs;`);
+    console.log("Cleanup data - ", testName);
+  }
+}
+
 export async function cleanupTestEnv() {
   if (testPool) {
     await testPool.end();

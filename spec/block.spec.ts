@@ -50,4 +50,95 @@ test("test isBlockIdValid()", async () => {
   expect(invalidBlockId).toBe(false);
 });
 
-// test("test /blocks", async () => {});
+test("test /blocks", async () => {
+  const height = 3;
+  const transactions: Transaction[] = [
+    {
+      id: "tx4",
+      inputs: [
+        {
+          txId: "tx3",
+          index: 1,
+        },
+      ],
+      outputs: [
+        {
+          address: "addr5",
+          value: 15,
+        },
+        {
+          address: "addr2",
+          value: 25,
+        },
+      ],
+    },
+  ];
+  const hashString =
+    height.toString() + transactions.map((tx) => tx.id).join("");
+  const testBlock__valid: Block = {
+    id: createHash("sha256").update(hashString).digest("hex"),
+    height,
+    transactions,
+  };
+  const testBlock__invalidHeight: Block = {
+    id: createHash("sha256").update(hashString).digest("hex"),
+    height: 10,
+    transactions,
+  };
+  const testBlock__invalidId: Block = {
+    id: "block2",
+    height: height + 1,
+    transactions,
+  };
+  const invalidTransaction = structuredClone(transactions);
+  invalidTransaction[0].outputs[0].value = 10;
+  const testBlock__invalidSums: Block = {
+    id: createHash("sha256").update(hashString).digest("hex"),
+    height: height + 1,
+    transactions: invalidTransaction,
+  };
+
+  const res = await fetch("http://localhost:3001/blocks", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(testBlock__valid),
+  });
+  const res_invalidHeight = await fetch("http://localhost:3001/blocks", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(testBlock__invalidHeight),
+  });
+  const res_invalidId = await fetch("http://localhost:3001/blocks", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(testBlock__invalidId),
+  });
+  const res_invalidSums = await fetch("http://localhost:3001/blocks", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(testBlock__invalidSums),
+  });
+  if (res.status !== 200) {
+    console.log(await res.text());
+  }
+  expect(res.status).toBe(200);
+
+  expect(res_invalidHeight.status).toBe(400);
+  expect(JSON.parse(await res_invalidHeight.text()).error).toBe(
+    "Invalid height"
+  );
+
+  expect(res_invalidId.status).toBe(400);
+  expect(JSON.parse(await res_invalidId.text()).error).toBe("Invalid block id");
+
+  expect(res_invalidSums.status).toBe(400);
+  expect(JSON.parse(await res_invalidSums.text()).error).toBe("Invalid sums");
+});

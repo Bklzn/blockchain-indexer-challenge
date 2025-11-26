@@ -64,10 +64,10 @@ async function createTestData() {
   await testPool
     .query(
       `
-    INSERT INTO inputs (id, txid, previndex, prevtxid)
+    INSERT INTO inputs (txid, previndex, prevtxid)
     VALUES 
-    (0,'tx3',0,'tx1'),
-    (1,'tx3',0,'tx2')
+    ('tx3',0,'tx1'),
+    ('tx3',0,'tx2')
     `
     )
     .catch((err) => {

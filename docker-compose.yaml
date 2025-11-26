@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   db:
@@ -17,7 +17,11 @@ services:
     depends_on:
       - db
     environment:
-      DATABASE_URL: postgres://myuser:mypassword@db:5432/mydatabase
+      DB_USER: myuser
+      DB_PASSWD: mypassword
+      DB_HOST: db:5432
+      DB_NAME: mydatabase
+
     ports:
       - "3000:3000"
 
